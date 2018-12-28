@@ -8,16 +8,12 @@ let colors = [|"#00A878", "#D8F1A0", "#F3C178", "#FE5E41"|];
 
 let blocksize = "100px";
 
-let blockstyle = (is_highlighted: bool, color: string) =>
+let blockClassName = (is_highlighted: bool, bgcolor: string) =>
   is_highlighted ?
-    ReactDOMRe.Style.make(
-      ~backgroundColor=color,
-      ~width=blocksize,
-      ~height=blocksize,
-      ~animation="colorblocks_highlight 1s",
-      (),
+    Glamor.(
+      css([backgroundColor(bgcolor), width(blocksize), height(blocksize), animation("colorblocks_highlight 1s")])
     ) :
-    ReactDOMRe.Style.make(~backgroundColor=color, ~width=blocksize, ~height=blocksize, ());
+    Glamor.(css([backgroundColor(bgcolor), width(blocksize), height(blocksize)]));
 
 let component = ReasonReact.statelessComponent("ColorBlocks");
 
@@ -34,7 +30,7 @@ let make = (~highlight: option(int)=?, ~onBlockClick, _children) => {
                | Some(highlighted_index) => highlighted_index == i
                };
 
-             <button key={i |> string_of_int} style={blockstyle(is_highlighted, color)} onClick={_e => onBlockClick(i)} />;
+             <button key={i |> string_of_int} className={blockClassName(is_highlighted, color)} onClick={_e => onBlockClick(i)} />;
            })
         |> ReasonReact.array
       }

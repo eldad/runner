@@ -21,7 +21,7 @@ let make = _children => {
     | ColorDeselect => ReasonReact.Update({color_highlighted: None})
     },
   render: self =>
-    <div style={ReactDOMRe.Style.make(~display="flex", ~justifyContent="center", ())}>
+    <div className=Glamor.(css([display("flex"), justifyContent("center")]))>
       <ColorBlocks highlight=?{self.state.color_highlighted} onBlockClick={i => self.send(ColorHighlight(i))} />
     </div>,
 };

@@ -8,6 +8,7 @@
     "reason-react",
     "@glennsl/bs-jest",
     "bs-fetch",
+    "bs-glamor",
     "@eldadzack/rr-mdi"
   ],
   "reason": {

@@ -5,6 +5,7 @@
   "dependencies": {
     "@eldadzack/rr-mdi": "https://github.com/eldad/rr-mdi.git",
     "animate.css": "^3.7.0",
+    "bs-glamor": "https://github.com/reasonml-community/bs-glamor.git#1d0202edf30b1184acdf073548a005cf172b8a74",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "reason-scripts": "1.0.0"
