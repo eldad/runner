@@ -20,7 +20,7 @@ let blockClassName = (is_highlighted: bool, bgcolor: string) => {
 
 let component = ReasonReact.statelessComponent("ColorBlocks");
 
-let make = (~highlight: option(int)=?, ~onBlockClick, _children) => {
+let make = (~highlight: option(int)=?, ~onBlockClick=?, _children) => {
   ...component,
   render: _self =>
     <div>
@@ -36,7 +36,13 @@ let make = (~highlight: option(int)=?, ~onBlockClick, _children) => {
              <button
                key={i |> string_of_int}
                className={blockClassName(is_highlighted, color)}
-               onClick={_e => onBlockClick(i)}
+               onClick=?{
+                 onBlockClick
+                 |> Js.Option.map((. f) => {
+                      let fn = _e => f(i);
+                      fn; /* Syntax issue? */
+                    })
+               }
              />;
            })
         |> ReasonReact.array
