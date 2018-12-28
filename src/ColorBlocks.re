@@ -11,18 +11,12 @@ let block_hightlight_animation =
     keyframes([("0%", [filter("grayscale(0)")]), ("50%", [filter("grayscale(1)")]), ("100%", [filter("grayscale(0)")])])
   );
 
-let blockClassName = (is_highlighted: bool, bgcolor: string) =>
+let blockClassName = (is_highlighted: bool, bgcolor: string) => {
+  let base_style = Glamor.(css([backgroundColor(bgcolor), width(blocksize), height(blocksize)]));
+
   is_highlighted ?
-    Glamor.(
-      css([
-        backgroundColor(bgcolor),
-        width(blocksize),
-        height(blocksize),
-        animationName(block_hightlight_animation),
-        animationDuration("1s"),
-      ])
-    ) :
-    Glamor.(css([backgroundColor(bgcolor), width(blocksize), height(blocksize)]));
+    Glamor.(merge([base_style, css([animationName(block_hightlight_animation), animationDuration("1s")])])) : base_style;
+};
 
 let component = ReasonReact.statelessComponent("ColorBlocks");
 
