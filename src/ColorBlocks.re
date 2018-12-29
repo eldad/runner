@@ -20,7 +20,7 @@ let blockClassName = (is_highlighted: bool, bgcolor: string) => {
 
 let component = ReasonReact.statelessComponent("ColorBlocks");
 
-let make = (~highlight: option(int)=?, ~onBlockClick=?, _children) => {
+let make = (~highlight: option(int)=?, ~disabled=true, ~onBlockClick=?, _children) => {
   ...component,
   render: _self =>
     <div>
@@ -34,6 +34,7 @@ let make = (~highlight: option(int)=?, ~onBlockClick=?, _children) => {
                };
 
              <button
+               disabled
                key={i |> string_of_int}
                className={blockClassName(is_highlighted, color)}
                onClick=?{
