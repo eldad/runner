@@ -6,7 +6,7 @@ let debug = false;
 
 Random.self_init();
 
-let generate_sequence = () => Array.make(6, 0) |> Array.map(_v => Random.int(4));
+let generate_sequence = () => Array.make(2, 0) |> Array.map(_v => Random.int(4));
 
 /* Use polymorphic variants, because they get converted to strings */
 [@bs.deriving jsConverter]
@@ -44,6 +44,11 @@ let make = _children => {
       ReasonReact.Update({...state, points, stage: `Idle});
     | _ => ReasonReact.NoUpdate
     },
+  didUpdate: (oldAndNewSelf) => {
+    let self = oldAndNewSelf.newSelf;
+    let context = Dom_html.getCanvas2DContext("canvas");
+    Dom_html.requestAnimationFrame(_f => CanvasRender.render(~context, ~width=320, ~height=640, ~points=self.state.points, ())) |> ignore;
+  },
   render: self => {
     let debug_info =
       debug ?
