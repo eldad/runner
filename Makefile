@@ -4,11 +4,11 @@
 # 'clean':         clean up generated files
 # 'bs':            make bucklescript
 
-.PHONY: build deps root clean remake build start bs
+.PHONY: build deps root clean remake build start bs public/media
 build: deps
 	yarn build
 
-deps: public root public/mdi public/animate.css
+deps: public root public/mdi public/animate.css public/media
 
 remake: clean all
 
@@ -19,6 +19,9 @@ public:
 	mkdir -p public
 
 root: public/index.html public/manifest.json public/favicon.ico
+
+public/media:
+	rsync -ra --delete --exclude CREDITS root/media/ public/media/
 
 public/index.html: root/index.html
 	cp root/index.html public/

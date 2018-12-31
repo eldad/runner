@@ -8,6 +8,8 @@ Random.self_init();
 
 let generate_sequence = () => Array.make(2, 0) |> Array.map(_v => Random.int(4));
 
+let bg_image = Dom_html.createImgFromSrc("media/bgimage.png");
+
 /* Use polymorphic variants, because they get converted to strings */
 [@bs.deriving jsConverter]
 type stage = [ | `Idle | `Play | `Input];
@@ -44,10 +46,16 @@ let make = _children => {
       ReasonReact.Update({...state, points, stage: `Idle});
     | _ => ReasonReact.NoUpdate
     },
-  didUpdate: (oldAndNewSelf) => {
+  didUpdate: oldAndNewSelf => {
     let self = oldAndNewSelf.newSelf;
-    let context = Dom_html.getCanvas2DContext("canvas");
-    Dom_html.requestAnimationFrame(_f => CanvasRender.render(~context, ~width=320, ~height=640, ~points=self.state.points, ())) |> ignore;
+    switch (Dom_html.getCanvas2DContext("canvas")) {
+    | Some(context) =>
+      Dom_html.requestAnimationFrame(_f =>
+        CanvasRender.render(~context, ~width=320, ~height=320, ~points=self.state.points, ~image=bg_image, ())
+      )
+      |> ignore
+    | None => ()
+    };
   },
   render: self => {
     let debug_info =
@@ -78,6 +86,7 @@ let make = _children => {
           />
         }
       }
+      <canvas id="canvas" width="320" height="320"></canvas>
     </div>;
   },
 };
