@@ -2,9 +2,9 @@
      Color Blocks Animation
  */
 
-let timeout_start = 1000;
+let timeout_start = 700;
 let timeout_next = 100;
-let timeout_pause = 1000;
+let timeout_pause = 700;
 
 type state = {
   position: int,
