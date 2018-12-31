@@ -2,6 +2,7 @@
 /build
 /public
 
+.vscode
 /SCRATCHPAD.*
 
 # bucklescript
