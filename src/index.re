@@ -5,4 +5,4 @@
 
 ReactDOMRe.renderToElementWithId(<App />, "root");
 
-unregister_service_worker();
+register_service_worker();
