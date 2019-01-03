@@ -51,7 +51,7 @@ let make = _children => {
     };
 
     Dom_html.(addEventListener(document, "keydown", keydown, false));
-    self.onUnmount(() =>  Dom_html.(removeEventListener(document, "keydown", keydown, false)));
+    self.onUnmount(() => Dom_html.(removeEventListener(document, "keydown", keydown, false)));
 
     let keyup = _e => {
       self.send(KeyUp);
@@ -59,7 +59,7 @@ let make = _children => {
     };
 
     Dom_html.(addEventListener(document, "keyup", keyup, false));
-    self.onUnmount(() =>  Dom_html.(removeEventListener(document, "keyup", keyup, false)));
+    self.onUnmount(() => Dom_html.(removeEventListener(document, "keyup", keyup, false)));
 
     ();
   },
@@ -79,10 +79,8 @@ let make = _children => {
       /* velocity -100..100 */
       /* let velocity = 200 * (x - canvas_width / 2) / canvas_width; */
       ReasonReact.Update({...state, x, y})
-    | (KeyDown, Some(data)) =>
-      ReasonReact.Update({...state, data: Some(data->GameState.handleKeyDown)});
-    | (KeyUp, Some(data)) =>
-      ReasonReact.Update({...state, data: Some(data->GameState.handleKeyUp)});
+    | (KeyDown, Some(data)) => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyDown)})
+    | (KeyUp, Some(data)) => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyUp)})
     | _ => ReasonReact.NoUpdate
     },
   didUpdate: oldAndNewSelf => {
@@ -110,18 +108,10 @@ let make = _children => {
         id="canvas"
         width={canvas_width |> string_of_int}
         height={canvas_height |> string_of_int}
-        onTouchStart={
-          (_e) => self.send(KeyDown)
-        }
-        onTouchEnd={
-          (_e) => self.send(KeyUp)
-        }
-        onMouseDown={
-          (_e) => self.send(KeyDown)
-        }
-        onMouseUp={
-          (_e) => self.send(KeyUp)
-        }
+        onTouchStart={_e => self.send(KeyDown)}
+        onTouchEnd={_e => self.send(KeyUp)}
+        onMouseDown={_e => self.send(KeyDown)}
+        onMouseUp={_e => self.send(KeyUp)}
         onClick={
           e => {
             let ne = e |> ReactEvent.Mouse.nativeEvent;
