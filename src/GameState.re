@@ -3,6 +3,8 @@
      Shared between the app and the canvas.
  */
 
+Random.self_init();
+
 type exhaustable =
   | Ready
   | On(float)
@@ -61,7 +63,15 @@ let updateObstacles: t => t =
 let generateObstacles: t => t =
   state => {
     if (state.obstacles |> Array.length < 1) {
-      state.obstacles |> Js.Array.push(state.distance +. 700.) |> ignore;
+      let min_space = 120.;
+      let last_distance = ref(state.distance +. 700.);
+
+      for (n in 0 to Random.int(9)) {
+        let distance = last_distance^ +. min_space +. Random.float(150.);
+        state.obstacles |> Js.Array.push(distance) |> ignore;
+        last_distance := distance;
+        Js.log(state.obstacles);
+      };
     };
 
     state;
