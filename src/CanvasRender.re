@@ -22,10 +22,11 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
   context->(CanvasBackgroundImage.render(CanvasData.powerlines, width, height, bgscroll->parallax(1)));
   context->(CanvasBackgroundImage.render(CanvasData.pavement, width, height, bgscroll->parallax(0)));
 
-  let player_size = 10;
-  let player_y = height - player_size - (data.player_y |> Js.Math.floor);
+  let player_sprite = data.player_y == 0. ? CanvasData.greenbob : CanvasData.greenbobjump;
 
-  context->Dom_html.fillRect(0, player_y, player_size, player_size);
+  let player_frame = (data.time *. 10. |> Js.Math.floor);
+  let player_y = CanvasData.pavement_height + (data.player_y |> Js.Math.floor);
+  context->(CanvasSprite.render(~viewport_h=height, player_sprite, 10, player_y, player_frame));
 
   ();
 };

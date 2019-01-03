@@ -13,13 +13,14 @@ type t = {
   player_y: float,
   bgscroll: float,
   velocity: int,
+  time: float,
 };
 
-let player_jump_t = 5.0;
+let player_jump_t = 0.4;
 let player_jump_impulse = 200.0;
-let player_gravity_impulse = (-100.0);
+let player_gravity_impulse = -100.0;
 
-let initialState = () => {player_jumping: Ready, player_y: 0., bgscroll: 0., velocity: 10};
+let initialState = () => {player_jumping: Ready, player_y: 0., bgscroll: 0., velocity: 50, time: 0.};
 
 let handleTick: (t, float) => t =
   (state, delta_t) => {
@@ -43,8 +44,9 @@ let handleTick: (t, float) => t =
       };
 
     let bgscroll = state.bgscroll +. delta_t *. (state.velocity |> float_of_int);
+    let time = state.time +. delta_t;
 
-    {...state, bgscroll};
+    {...state, bgscroll, time};
   };
 
 let handleKeyDown: t => t =
