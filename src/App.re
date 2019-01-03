@@ -4,35 +4,31 @@
 
 let debug = false;
 
+let canvas_width = 640;
+let canvas_height = 320;
+
 Random.self_init();
 
-module CanvasData = {
-  let bg_image = CanvasBackgroundImage.make(~src="media/bgimage.png", ~width=1600, ~height=316, ());
-};
-
-/* Use polymorphic variants, because they get converted to strings */
-[@bs.deriving jsConverter]
-type stage = [ | `Idle | `Play | `Input];
-
 type action =
-  | Play
+  | Start
+  | Fullscreen
   | Tick
   | CanvasClick(int, int);
 
 type state = {
-  color_highlighted: option(int),
-  stage,
+  start: bool,
   bgscroll: float,
-  clicks: int,
+  velocity: int,
   x: int,
   y: int,
   last_tick: option(float),
 };
 
 let handleTick: (state, float) => state =
-  (state, delta_t) => delta_t > 1.0 ? state : {...state, bgscroll: state.bgscroll +. delta_t *. (state.clicks |> float_of_int)};
+  (state, delta_t) =>
+    delta_t > 1.0 ? state : {...state, bgscroll: state.bgscroll +. delta_t *. (state.velocity |> float_of_int)};
 
-let initialState = () => {color_highlighted: None, stage: `Idle, x: 0, y: 0, clicks: 100, bgscroll: 1550., last_tick: None};
+let initialState = () => {start: false, x: 0, y: 0, velocity: 0, bgscroll: 0., last_tick: None};
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -45,7 +41,8 @@ let make = _children => {
   },
   reducer: (action, state) =>
     switch (action) {
-    | Tick =>
+    | Start => ReasonReact.Update({...state, start: true})
+    | Tick when state.start =>
       let now = Js.Date.now() /. 1000.0;
       switch (state.last_tick) {
       | None => ReasonReact.Update({...state, last_tick: Some(now)})
@@ -53,55 +50,52 @@ let make = _children => {
         let delta_t = now -. last_tick;
         ReasonReact.Update({...state->handleTick(delta_t), last_tick: Some(now)});
       };
-    | Play when state.stage == `Idle =>
-      ReasonReact.UpdateWithSideEffects(
-        {...state, stage: `Play},
-        (_self => Dom_html.requestFullscreenElement("canvas-") |> ignore),
-      )
-    | Play => ReasonReact.NoUpdate
-    | CanvasClick(x, y) => ReasonReact.Update({...state, clicks: state.clicks + 1, x, y})
+    | Tick => ReasonReact.NoUpdate
+    | Fullscreen => ReasonReact.SideEffects((_self => Dom_html.requestFullscreenElement("canvas") |> ignore))
+    | CanvasClick(x, y) =>
+      /* velocity -100..100 */
+      let velocity = 200 * (x - canvas_width / 2) / canvas_width;
+      ReasonReact.Update({...state, velocity, x, y});
     },
   didUpdate: oldAndNewSelf => {
     let self = oldAndNewSelf.newSelf;
     switch (Dom_html.getCanvas2DContext("canvas")) {
     | Some(context) =>
       Dom_html.requestAnimationFrame(_f =>
-        CanvasRender.render(
-          ~context,
-          ~width=640,
-          ~height=320,
-          ~bg_image=CanvasData.bg_image,
-          ~bgscroll=self.state.bgscroll |> int_of_float,
-          (),
-        )
+        CanvasRender.render(~context, ~width=640, ~height=320, ~bgscroll=self.state.bgscroll |> Js.Math.floor, ())
       )
       |> ignore
     | None => ()
     };
   },
-  render: self => {
-    let debug_info =
-      debug ?
-        <div className=Glamor.(css([backgroundColor("#000")]))> {self.state.stage |> stageToJs |> ReasonReact.string} </div> :
-        ReasonReact.null;
-
+  render: self =>
     <div className=Glamor.(css([display("flex"), alignItems("center"), flexDirection("column")]))>
       <div className=Glamor.(css([backgroundColor("#333")]))>
-        {Printf.sprintf("Clicks: %d, x: %d, y: %d", self.state.clicks, self.state.x, self.state.y) |> ReasonReact.string}
-      </div>
-      debug_info
-      {
-        switch (self.state.stage) {
-        | `Idle => <div> <button onClick=(_e => self.send(Play))> {"Play" |> ReasonReact.string} </button> </div>
-        | _ => ReasonReact.null
+        {
+          Printf.sprintf(
+            "Scroll: %f, Velocity: %d, x: %d, y: %d",
+            self.state.bgscroll,
+            self.state.velocity,
+            self.state.x,
+            self.state.y,
+          )
+          |> ReasonReact.string
         }
-      }
+      </div>
+      <div>
+        <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button>
+        <button onClick={_e => self.send(Start)}> {"Start" |> ReasonReact.string} </button>
+      </div>
       <canvas
         id="canvas"
-        width="640"
-        height="320"
-        onClick={e => self.send(CanvasClick(e |> ReactEvent.Mouse.clientX, e |> ReactEvent.Mouse.clientY))}
+        width={canvas_width |> string_of_int}
+        height={canvas_height |> string_of_int}
+        onClick={
+          e => {
+            let ne = e |> ReactEvent.Mouse.nativeEvent;
+            self.send(CanvasClick(ne##offsetX, ne##offsetY));
+          }
+        }
       />
-    </div>;
-  },
+    </div>,
 };
