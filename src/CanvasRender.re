@@ -69,7 +69,7 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
 
   switch (data.state) {
   | Idle => context->render_banner(width, "Ready?");
-  | Run when data.time < 5.0 => context->render_banner(width, "Run!");
+  | Run when data.time < 2.0 => context->render_banner(width, "Run!");
   | GameOver => context->render_banner(width, "Game Over");
   | _ => ()
   };

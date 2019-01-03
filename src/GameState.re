@@ -78,8 +78,9 @@ let handleTick: (t, float) => t =
 
 let handleKeyDown: t => t =
   state =>
-    switch (state.player_jumping) {
-    | Ready when state.player_y == 0. => {...state, player_jumping: On(player_jump_t)}
+    switch (state.state, state.player_jumping) {
+    | (Idle, _)  => {...initialState(), state: Run};
+    | (Run, Ready) when state.player_y == 0. => {...state, player_jumping: On(player_jump_t)}
     | _ => state
     };
 

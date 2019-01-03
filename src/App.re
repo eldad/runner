@@ -32,7 +32,7 @@ let handleTick: (state, float) => state =
     | _ => state
     };
 
-let initialState = () => {start: false, x: 0, y: 0, last_tick: None, data: None};
+let initialState = () => {start: false, x: 0, y: 0, last_tick: None, data: Some(GameState.initialState())};
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -66,7 +66,7 @@ let make = _children => {
   reducer: (action, state) =>
     switch (action, state.data) {
     | (Start, _) => ReasonReact.Update({...state, start: true, data: Some(GameState.initialState())})
-    | (Tick, _) when state.start =>
+    | (Tick, _) =>
       let now = Js.Date.now() /. 1000.0;
       switch (state.last_tick) {
       | None => ReasonReact.Update({...state, last_tick: Some(now)})
@@ -97,13 +97,6 @@ let make = _children => {
   },
   render: self =>
     <div className=Glamor.(css([display("flex"), alignItems("center"), flexDirection("column")]))>
-      <div className=Glamor.(css([backgroundColor("#333")]))>
-        {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
-      </div>
-      <div>
-        <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button>
-        <button onClick={_e => self.send(Start)}> {"Start" |> ReasonReact.string} </button>
-      </div>
       <canvas
         id="canvas"
         width={canvas_width |> string_of_int}
@@ -119,5 +112,9 @@ let make = _children => {
           }
         }
       />
+      <div> <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button> </div>
+      <div className=Glamor.(css([backgroundColor("#333")]))>
+        {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
+      </div>
     </div>,
 };
