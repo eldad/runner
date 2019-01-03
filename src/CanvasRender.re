@@ -28,5 +28,7 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
   let player_y = CanvasData.pavement_height + (data.player_y |> Js.Math.floor);
   context->(CanvasSprite.render(~viewport_h=height, player_sprite, 10, player_y, player_frame));
 
+  context->(CanvasSprite.render(~viewport_h=height, CanvasData.crate, width - bgscroll, CanvasData.pavement_height, 0));
+
   ();
 };

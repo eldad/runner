@@ -13,3 +13,5 @@ let pavement_height = 15;
 
 let greenbob = CanvasSprite.make(~src="media/citymega-greenbob.png", ~width=32, ~height=32, ~frames=6, ());
 let greenbobjump = CanvasSprite.make(~src="media/citymega-greenbob-jump.png", ~width=32, ~height=32, ~frames=2, ());
+
+let crate = CanvasSprite.make(~src="media/citymega-crate24.png", ~width=24, ~height=24, ~frames=1, ());

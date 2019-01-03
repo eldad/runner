@@ -16,11 +16,11 @@ type t = {
   time: float,
 };
 
-let player_jump_t = 0.4;
-let player_jump_impulse = 200.0;
-let player_gravity_impulse = -100.0;
+let player_jump_t = 0.5;
+let player_jump_impulse = 400.0;
+let player_gravity_impulse = -200.0;
 
-let initialState = () => {player_jumping: Ready, player_y: 0., bgscroll: 0., velocity: 50, time: 0.};
+let initialState = () => {player_jumping: Ready, player_y: 0., bgscroll: 0., velocity: 200, time: 0.};
 
 let handleTick: (t, float) => t =
   (state, delta_t) => {
