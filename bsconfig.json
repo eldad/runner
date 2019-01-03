@@ -1,5 +1,5 @@
 {
-  "name": "colorpeat",
+  "name": "runner",
   "sources": {
     "dir": "src",
     "subdirs": true
