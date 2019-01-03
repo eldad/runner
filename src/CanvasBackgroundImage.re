@@ -25,9 +25,6 @@ let render = (context: Dom_html.context, bgimage: t, viewport_width: int, viewpo
   let sx = (offset mod viewport_width) mod bgimage.width;
   let sw = Js.Math.min_int(bgimage.width - sx, viewport_width);
 
-  Js.log(sx);
-  Js.log(sw);
-
   context->(Dom_html.blitImage(bgimage.img, sx, 0, 0, dy, sw, bgimage.height));
 
   let dx = ref(sw);
