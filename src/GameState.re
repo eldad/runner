@@ -11,16 +11,17 @@ type exhaustable =
 type t = {
   player_jumping: exhaustable,
   player_y: float,
-  bgscroll: float,
+  distance: float,
   velocity: int,
   time: float,
+  obstacles: array(float),
 };
 
 let player_jump_t = 0.5;
 let player_jump_impulse = 400.0;
 let player_gravity_impulse = -200.0;
 
-let initialState = () => {player_jumping: Ready, player_y: 0., bgscroll: 0., velocity: 200, time: 0.};
+let initialState = () => {player_jumping: Ready, player_y: 0., distance: 0., velocity: 200, time: 0., obstacles: [|1000., 1500., 1700., 1900.|]};
 
 let handleTick: (t, float) => t =
   (state, delta_t) => {
@@ -43,10 +44,10 @@ let handleTick: (t, float) => t =
       | Ready => state
       };
 
-    let bgscroll = state.bgscroll +. delta_t *. (state.velocity |> float_of_int);
+    let distance = state.distance +. delta_t *. (state.velocity |> float_of_int);
     let time = state.time +. delta_t;
 
-    {...state, bgscroll, time};
+    {...state, distance, time};
   };
 
 let handleKeyDown: t => t =
