@@ -7,3 +7,6 @@ Fullscreen request is best effort. Instead, its promise should be resolved and t
 
 Canvas mouse click event (offsetX, offsetY) in fullscreen mode is "wrong" (it is actually the screen resolution.)
 -> Fullscreen request promise should be resolved. The offsets then need to be scaled.
+
+* Alternatively, use hit regions!
+https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/addHitRegion
