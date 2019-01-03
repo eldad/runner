@@ -27,6 +27,9 @@ let player_jump_t = 0.5;
 let player_jump_impulse = 400.0;
 let player_gravity_impulse = (-200.0);
 
+let player_collision_x1 = 42.;
+let player_collision_x2 = player_collision_x1 +. 12.; /* greenbob is 12px long */
+
 let initialState = () => {
   state: Idle,
   player_jumping: Ready,
@@ -37,7 +40,21 @@ let initialState = () => {
   obstacles: [|1000., 1500., 1700., 1900.|],
 };
 
-let checkCollision: t => t = state => state;
+let checkCollision: t => t =
+  state => {
+    let collision = ref(false);
+
+    state.obstacles
+    |> Array.iter(o =>
+         if (o > state.distance +. player_collision_x1 && o < state.distance +. player_collision_x2) {
+           if (state.player_y |> Js.Math.floor < CanvasData.crate_height) {
+             collision := true;
+           };
+         }
+       );
+
+    collision^ ? {...state, state: GameOver} : state;
+  };
 
 let updatePlayer: (t, float) => t =
   (state, delta_t) => {
@@ -79,7 +96,7 @@ let handleTick: (t, float) => t =
 let handleKeyDown: t => t =
   state =>
     switch (state.state, state.player_jumping) {
-    | (Idle, _)  => {...initialState(), state: Run};
+    | (Idle, _) => {...initialState(), state: Run}
     | (Run, Ready) when state.player_y == 0. => {...state, player_jumping: On(player_jump_t)}
     | _ => state
     };
