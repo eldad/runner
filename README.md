@@ -9,3 +9,6 @@ Canvas mouse click event (offsetX, offsetY) in fullscreen mode is "wrong" (it is
 
 * Alternatively, use hit regions!
 https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/addHitRegion
+
+...but Chrome on Android does not support this.
+https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/addHitRegion#Browser_compatibility

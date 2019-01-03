@@ -2,20 +2,25 @@
      DOM Bindings and helper functions
  */
 
+type document;
+let document: document = [%bs.raw {| document |}];
+
 /* Animation frame */
 
 type requestId;
 [@bs.val] external requestAnimationFrame: (float => unit) => requestId = "";
 [@bs.val] external cancelAnimationFrame: requestId => unit = "";
 
+/* Keyboard events (document level) */
+
+[@bs.send] external addEventListener: (document, string, Dom.event_like('a) => bool, bool) => unit = "";
+[@bs.send] external removeEventListener: (document, string, Dom.event_like('a) => bool, bool) => unit = "";
+
 /* Canvas */
 
 type canvas;
 type element;
 type context;
-type document;
-
-let document: document = [%bs.raw {| document |}];
 
 [@bs.send] external getContext: (canvas, string) => context = "";
 [@bs.send] external getCanvasById: (document, string) => Js.Nullable.t(canvas) = "getElementById";
@@ -56,9 +61,7 @@ let createImgFromSrc: string => img =
 [@bs.send] external requestFullscreen: element => unit = "";
 [@bs.send] external webkitRequestFullScreen: element => unit = "";
 
-let blitImage = (context, img, sx, sy, dx, dy, w, h) => {
-  drawImageBlit(context, img, sx, sy, w, h, dx, dy, w, h);
-};
+let blitImage = (context, img, sx, sy, dx, dy, w, h) => drawImageBlit(context, img, sx, sy, w, h, dx, dy, w, h);
 
 let requestFullscreenElement = elementId =>
   elementId

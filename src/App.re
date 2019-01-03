@@ -13,22 +13,26 @@ type action =
   | Start
   | Fullscreen
   | Tick
-  | CanvasClick(int, int);
+  | CanvasClick(int, int)
+  | KeyUp
+  | KeyDown;
 
 type state = {
   start: bool,
-  bgscroll: float,
-  velocity: int,
   x: int,
   y: int,
   last_tick: option(float),
+  data: option(GameState.t),
 };
 
 let handleTick: (state, float) => state =
   (state, delta_t) =>
-    delta_t > 1.0 ? state : {...state, bgscroll: state.bgscroll +. delta_t *. (state.velocity |> float_of_int)};
+    switch (state.data) {
+    | Some(data) when delta_t < 1.0 => {...state, data: Some(data->GameState.handleTick(delta_t))}
+    | _ => state
+    };
 
-let initialState = () => {start: false, x: 0, y: 0, velocity: 0, bgscroll: 0., last_tick: None};
+let initialState = () => {start: false, x: 0, y: 0, last_tick: None, data: None};
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -38,11 +42,31 @@ let make = _children => {
   didMount: self => {
     let intervalId = Js.Global.setInterval(() => self.send(Tick), debug ? 1000 : 0);
     self.onUnmount(() => Js.Global.clearInterval(intervalId));
+
+    /* Keyboard events */
+
+    let keydown = _e => {
+      self.send(KeyDown);
+      true;
+    };
+
+    Dom_html.(addEventListener(document, "keydown", keydown, false));
+    self.onUnmount(() =>  Dom_html.(removeEventListener(document, "keydown", keydown, false)));
+
+    let keyup = _e => {
+      self.send(KeyUp);
+      true;
+    };
+
+    Dom_html.(addEventListener(document, "keyup", keyup, false));
+    self.onUnmount(() =>  Dom_html.(removeEventListener(document, "keyup", keyup, false)));
+
+    ();
   },
   reducer: (action, state) =>
-    switch (action) {
-    | Start => ReasonReact.Update({...state, start: true})
-    | Tick when state.start =>
+    switch (action, state.data) {
+    | (Start, _) => ReasonReact.Update({...state, start: true, data: Some(GameState.initialState())})
+    | (Tick, _) when state.start =>
       let now = Js.Date.now() /. 1000.0;
       switch (state.last_tick) {
       | None => ReasonReact.Update({...state, last_tick: Some(now)})
@@ -50,37 +74,33 @@ let make = _children => {
         let delta_t = now -. last_tick;
         ReasonReact.Update({...state->handleTick(delta_t), last_tick: Some(now)});
       };
-    | Tick => ReasonReact.NoUpdate
-    | Fullscreen => ReasonReact.SideEffects((_self => Dom_html.requestFullscreenElement("canvas") |> ignore))
-    | CanvasClick(x, y) =>
+    | (Fullscreen, _) => ReasonReact.SideEffects((_self => Dom_html.requestFullscreenElement("canvas") |> ignore))
+    | (CanvasClick(x, y), _) =>
       /* velocity -100..100 */
-      let velocity = 200 * (x - canvas_width / 2) / canvas_width;
-      ReasonReact.Update({...state, velocity, x, y});
+      /* let velocity = 200 * (x - canvas_width / 2) / canvas_width; */
+      ReasonReact.Update({...state, x, y})
+    | (KeyDown, Some(data)) =>
+      ReasonReact.Update({...state, data: Some(data->GameState.handleKeyDown)});
+    | (KeyUp, Some(data)) =>
+      ReasonReact.Update({...state, data: Some(data->GameState.handleKeyUp)});
+    | _ => ReasonReact.NoUpdate
     },
   didUpdate: oldAndNewSelf => {
     let self = oldAndNewSelf.newSelf;
-    switch (Dom_html.getCanvas2DContext("canvas")) {
-    | Some(context) =>
-      Dom_html.requestAnimationFrame(_f =>
-        CanvasRender.render(~context, ~width=canvas_width, ~height=canvas_height, ~bgscroll=self.state.bgscroll |> Js.Math.floor, ())
-      )
+    switch (Dom_html.getCanvas2DContext("canvas"), self.state.data) {
+    | (Some(context), Some(data)) =>
+      Dom_html.requestAnimationFrame(_f => CanvasRender.render(~context, ~width=canvas_width, ~height=canvas_height, ~data, ()))
       |> ignore
-    | None => ()
+    /*
+     | (Some(context), None) => attraction screen
+     */
+    | _ => ()
     };
   },
   render: self =>
     <div className=Glamor.(css([display("flex"), alignItems("center"), flexDirection("column")]))>
       <div className=Glamor.(css([backgroundColor("#333")]))>
-        {
-          Printf.sprintf(
-            "Scroll: %f, Velocity: %d, x: %d, y: %d",
-            self.state.bgscroll,
-            self.state.velocity,
-            self.state.x,
-            self.state.y,
-          )
-          |> ReasonReact.string
-        }
+        {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
       </div>
       <div>
         <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button>
@@ -90,6 +110,18 @@ let make = _children => {
         id="canvas"
         width={canvas_width |> string_of_int}
         height={canvas_height |> string_of_int}
+        onTouchStart={
+          (_e) => self.send(KeyDown)
+        }
+        onTouchEnd={
+          (_e) => self.send(KeyUp)
+        }
+        onMouseDown={
+          (_e) => self.send(KeyDown)
+        }
+        onMouseUp={
+          (_e) => self.send(KeyUp)
+        }
         onClick={
           e => {
             let ne = e |> ReactEvent.Mouse.nativeEvent;
