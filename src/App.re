@@ -113,8 +113,10 @@ let make = _children => {
         }
       />
       <div> <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button> </div>
+      /*
       <div className=Glamor.(css([backgroundColor("#333")]))>
         {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
       </div>
+      */
     </div>,
 };

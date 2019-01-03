@@ -11,7 +11,7 @@ type exhaustable =
 type state =
   | Idle
   | Run
-  | GameOver;
+  | GameOver(float);
 
 type t = {
   state,
@@ -20,6 +20,7 @@ type t = {
   distance: float,
   velocity: int,
   time: float,
+  score: int,
   obstacles: array(float),
 };
 
@@ -30,6 +31,9 @@ let player_gravity_impulse = (-200.0);
 let player_collision_x1 = 42.;
 let player_collision_x2 = player_collision_x1 +. 12.; /* greenbob is 12px long */
 
+let gameover_timeout = 10.;
+let obstacle_horizon = 700.;
+
 let initialState = () => {
   state: Idle,
   player_jumping: Ready,
@@ -37,8 +41,31 @@ let initialState = () => {
   distance: 0.,
   velocity: 200,
   time: 0.,
-  obstacles: [|1000., 1500., 1700., 1900.|],
+  score: 0,
+  obstacles: [||],
 };
+
+let updateObstacles: t => t =
+  state => {
+    let score = ref(state.score);
+    if (state.obstacles |> Array.length > 0) {
+      if (state.obstacles->Array.get(0) < state.distance) {
+        state.obstacles |> Js.Array.shift |> ignore;
+        score := score^ + 1;
+      };
+    };
+
+    {...state, score: score^};
+  };
+
+let generateObstacles: t => t =
+  state => {
+    if (state.obstacles |> Array.length < 1) {
+      state.obstacles |> Js.Array.push(state.distance +. 700.) |> ignore;
+    };
+
+    state;
+  };
 
 let checkCollision: t => t =
   state => {
@@ -53,7 +80,7 @@ let checkCollision: t => t =
          }
        );
 
-    collision^ ? {...state, state: GameOver} : state;
+    collision^ ? {...state, state: GameOver(gameover_timeout)} : state;
   };
 
 let updatePlayer: (t, float) => t =
@@ -85,18 +112,19 @@ let updatePlayer: (t, float) => t =
 
 let handleTick: (t, float) => t =
   (state, delta_t) =>
-    (
-      switch (state.state) {
-      | Run => state->updatePlayer(delta_t)
-      | _ => state
-      }
-    )
-    |> checkCollision;
+    switch (state.state) {
+    | GameOver(t) =>
+      let t = t -. delta_t;
+      t < 0. ? initialState() : {...state, state: GameOver(t)};
+    | Run => state->updatePlayer(delta_t) |> checkCollision |> updateObstacles |> generateObstacles;
+    | _ => state
+    };
 
 let handleKeyDown: t => t =
   state =>
     switch (state.state, state.player_jumping) {
     | (Idle, _) => {...initialState(), state: Run}
+    | (GameOver(_), _) => initialState()
     | (Run, Ready) when state.player_y == 0. => {...state, player_jumping: On(player_jump_t)}
     | _ => state
     };
