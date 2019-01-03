@@ -32,12 +32,27 @@ let getCanvas2DContext: string => option(context) =
 
 /* Canvas Ops */
 
+external js_of_canvas: canvas => Js.t({..}) = "%identity";
+external js_of_context: context => Js.t({..}) = "%identity";
+
 [@bs.send] external clearRect: (context, int, int, int, int) => unit = "";
 [@bs.send] external fillRect: (context, int, int, int, int) => unit = "";
 
-/* Escape Hatch: use canvas as Js option and access members with ## */
+let fillStyle = (context, fillStyle: string) => (context |> js_of_context)##fillStyle #= fillStyle;
 
-external js_of_canvas: canvas => Js.t({..}) = "%identity";
+/* Canvas Text */
+
+let setFont = (context, font: string) => (context |> js_of_context)##font #= font;
+
+type text_metrics;
+
+[@bs.send] external fillText: (context, string, int, int) => unit = "";
+[@bs.send] external fillTextMaxWidth: (context, string, int, int) => unit = "fillText";
+
+[@bs.send] external measureText: (context, string) => text_metrics = "";
+external js_of_text_metrics: text_metrics => Js.t({..}) = "%identity";
+
+let measureTextWidth = (context, text) => (measureText(context, text) |> js_of_text_metrics)##width;
 
 /* Image */
 

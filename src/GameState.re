@@ -8,7 +8,13 @@ type exhaustable =
   | On(float)
   | Exhausted;
 
+type state =
+  | Idle
+  | Run
+  | GameOver;
+
 type t = {
+  state,
   player_jumping: exhaustable,
   player_y: float,
   distance: float,
@@ -19,11 +25,21 @@ type t = {
 
 let player_jump_t = 0.5;
 let player_jump_impulse = 400.0;
-let player_gravity_impulse = -200.0;
+let player_gravity_impulse = (-200.0);
 
-let initialState = () => {player_jumping: Ready, player_y: 0., distance: 0., velocity: 200, time: 0., obstacles: [|1000., 1500., 1700., 1900.|]};
+let initialState = () => {
+  state: Idle,
+  player_jumping: Ready,
+  player_y: 0.,
+  distance: 0.,
+  velocity: 200,
+  time: 0.,
+  obstacles: [|1000., 1500., 1700., 1900.|],
+};
 
-let handleTick: (t, float) => t =
+let checkCollision: t => t = state => state;
+
+let updatePlayer: (t, float) => t =
   (state, delta_t) => {
     let state =
       switch (state.player_jumping) {
@@ -49,6 +65,16 @@ let handleTick: (t, float) => t =
 
     {...state, distance, time};
   };
+
+let handleTick: (t, float) => t =
+  (state, delta_t) =>
+    (
+      switch (state.state) {
+      | Run => state->updatePlayer(delta_t)
+      | _ => state
+      }
+    )
+    |> checkCollision;
 
 let handleKeyDown: t => t =
   state =>
