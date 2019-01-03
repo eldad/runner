@@ -22,10 +22,15 @@ let render = (context: Dom_html.context, bgimage: t, viewport_width: int, viewpo
     | Bottom => viewport_height - bgimage.height
     };
 
-  let sx = (offset mod viewport_width) mod bgimage.width;
-  let sw = Js.Math.min_int(bgimage.width - sx, viewport_width);
+  /* mod operation may return negative numbers */
+  let sx = ref(offset mod bgimage.width);
+  if (sx^ < 0) {
+    sx := sx^ + bgimage.width;
+  };
 
-  context->(Dom_html.blitImage(bgimage.img, sx, 0, 0, dy, sw, bgimage.height));
+  let sw = Js.Math.min_int(bgimage.width - sx^, viewport_width);
+
+  context->(Dom_html.blitImage(bgimage.img, sx^, 0, 0, dy, sw, bgimage.height));
 
   let dx = ref(sw);
 

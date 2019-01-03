@@ -36,7 +36,7 @@ let make = _children => {
   ...component,
   initialState,
   didMount: self => {
-    let intervalId = Js.Global.setInterval(() => self.send(Tick), 0);
+    let intervalId = Js.Global.setInterval(() => self.send(Tick), debug ? 1000 : 0);
     self.onUnmount(() => Js.Global.clearInterval(intervalId));
   },
   reducer: (action, state) =>
@@ -62,7 +62,7 @@ let make = _children => {
     switch (Dom_html.getCanvas2DContext("canvas")) {
     | Some(context) =>
       Dom_html.requestAnimationFrame(_f =>
-        CanvasRender.render(~context, ~width=640, ~height=320, ~bgscroll=self.state.bgscroll |> Js.Math.floor, ())
+        CanvasRender.render(~context, ~width=canvas_width, ~height=canvas_height, ~bgscroll=self.state.bgscroll |> Js.Math.floor, ())
       )
       |> ignore
     | None => ()

@@ -7,8 +7,8 @@ let parallax = (offset: int, plane_index: int) =>
   plane_index <= 0 ?
     offset :
     {
-      /* let lag = (plane_index + 1 |> float_of_int) /. (plane_index |> float_of_int); */
-      (offset |> float_of_int) /. (plane_index * plane_index |> float_of_int) |> Js.Math.floor
+      let lagfactor = (plane_index * plane_index |> float_of_int);
+      (offset |> float_of_int) /. lagfactor |> Js.Math.floor
     };
 
 let render = (~width, ~height, ~context: Dom_html.context, ~bgscroll: int, ()) => {
