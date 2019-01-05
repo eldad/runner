@@ -27,12 +27,12 @@ type t = {
   obstacles: array(float),
 };
 
-let player_jump_t = 0.3;
-let player_jump_impulse = 8.5;
-let player_gravity_impulse = (-8.0);
-let player_jump_t0_velocity = 100.;
+let player_jump_t = 0.4;
+let player_jump_impulse = 10.;
+let player_gravity_impulse = (-9.8);
+let player_jump_t0_velocity = 125.;
 
-let player_collision_x1 = 42.;
+let player_collision_x1 = 20.;
 let player_collision_x2 = player_collision_x1 +. 12.; /* greenbob is 12px long */
 
 let gameover_timeout = 10.;
@@ -54,7 +54,7 @@ let updateObstacles: t => t =
   state => {
     let score = ref(state.score);
     if (state.obstacles |> Array.length > 0) {
-      if (state.obstacles->Array.get(0) < state.distance) {
+      if (state.obstacles->Array.get(0) < state.distance -. (CanvasData.crate.width + 1 |> float_of_int)) {
         state.obstacles |> Js.Array.shift |> ignore;
         score := score^ + 1;
       };
@@ -85,8 +85,12 @@ let checkCollision: t => t =
 
     state.obstacles
     |> Array.iter(o =>
-         if (o > state.distance +. player_collision_x1 && o < state.distance +. player_collision_x2) {
-           if (state.player_y |> Js.Math.floor < CanvasData.crate_height) {
+         if (o <= state.distance
+             +. player_collision_x2
+             && o
+             +. (CanvasData.crate.width |> float_of_int) >= state.distance
+             +. player_collision_x1) {
+           if (state.player_y |> Js.Math.floor < CanvasData.crate.height) {
              collision := true;
            };
          }

@@ -76,17 +76,8 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
   data.obstacles
   |> Array.iter(pos => {
        let relative_pos = pos -. data.distance |> Js.Math.floor;
-       if (relative_pos > 0 && relative_pos < width + CanvasData.crate.width) {
-         context
-         ->(
-             CanvasSprite.render(
-               ~viewport_h=height,
-               CanvasData.crate,
-               relative_pos - CanvasData.crate.width,
-               CanvasData.pavement_height,
-               0,
-             )
-           );
+       if (relative_pos + CanvasData.crate.width > 0 && relative_pos < width) {
+         context->(CanvasSprite.render(~viewport_h=height, CanvasData.crate, relative_pos, CanvasData.pavement_height, 0));
        };
      });
 
