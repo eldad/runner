@@ -70,7 +70,6 @@ let generateObstacles: t => t =
         let distance = last_distance^ +. min_space +. Random.float(150.);
         state.obstacles |> Js.Array.push(distance) |> ignore;
         last_distance := distance;
-        Js.log(state.obstacles);
       };
     };
 

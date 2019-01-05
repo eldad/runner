@@ -15,6 +15,9 @@ type requestId;
 
 [@bs.send] external addEventListener: (document, string, Dom.event_like('a) => bool, bool) => unit = "";
 [@bs.send] external removeEventListener: (document, string, Dom.event_like('a) => bool, bool) => unit = "";
+external keyboardEventToJsObj: Dom.keyboardEvent => Js.t({..}) = "%identity";
+
+let keyboardEventKeyCode: Dom.keyboardEvent => int = keyboardEvent => keyboardEvent->keyboardEventToJsObj##keyCode;
 
 /* Canvas */
 

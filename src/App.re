@@ -45,16 +45,26 @@ let make = _children => {
 
     /* Keyboard events */
 
-    let keydown = _e => {
-      self.send(KeyDown);
+    let keydown = e => {
+      let code = e->Dom_html.keyboardEventKeyCode;
+      switch (code) {
+      | 87 => self.send(KeyDown) /* w */
+      | _ => Js.log(code)
+      };
+
       true;
     };
 
     Dom_html.(addEventListener(document, "keydown", keydown, false));
     self.onUnmount(() => Dom_html.(removeEventListener(document, "keydown", keydown, false)));
 
-    let keyup = _e => {
-      self.send(KeyUp);
+    let keyup = e => {
+      let code = e->Dom_html.keyboardEventKeyCode;
+      switch (code) {
+      | 87 => self.send(KeyUp) /* w */
+      | _ => ()
+      };
+
       true;
     };
 
@@ -113,10 +123,10 @@ let make = _children => {
         }
       />
       <div> <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button> </div>
-      /*
-      <div className=Glamor.(css([backgroundColor("#333")]))>
-        {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
-      </div>
-      */
     </div>,
+  /*
+   <div className=Glamor.(css([backgroundColor("#333")]))>
+     {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
+   </div>
+   */
 };
