@@ -46,12 +46,13 @@ let make = _children => {
     /* Keyboard events */
 
     let keydown = e => {
-      let code = e->Dom_html.keyboardEventKeyCode;
-      switch (code) {
-      | 87 => self.send(KeyDown) /* w */
-      | _ => Js.log(code)
+      if (!e->Dom_html.keyboardEventIsRepeat) {
+        let code = e->Dom_html.keyboardEventKey;
+        switch (code) {
+        | "w" => self.send(KeyDown)
+        | _ => ()
+        };
       };
-
       true;
     };
 
@@ -59,9 +60,9 @@ let make = _children => {
     self.onUnmount(() => Dom_html.(removeEventListener(document, "keydown", keydown, false)));
 
     let keyup = e => {
-      let code = e->Dom_html.keyboardEventKeyCode;
+      let code = e->Dom_html.keyboardEventKey;
       switch (code) {
-      | 87 => self.send(KeyUp) /* w */
+      | "w" => self.send(KeyUp)
       | _ => ()
       };
 
