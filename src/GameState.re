@@ -123,9 +123,7 @@ let updatePlayer: (t, float) => t =
 let handleTick: (t, float) => t =
   (state, delta_t) =>
     switch (state.state) {
-    | GameOver(t) =>
-      let t = t -. delta_t;
-      t < 0. ? initialState() : {...state, state: GameOver(t)};
+    | GameOver(t) =>  {...state, state: GameOver(Js.Math.max_float(0.0, t -. delta_t))};
     | Run => state->updatePlayer(delta_t) |> checkCollision |> updateObstacles |> generateObstacles;
     | _ => state
     };
