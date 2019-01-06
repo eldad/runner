@@ -32,7 +32,7 @@ let handleTick: (state, float) => state =
     | _ => state
     };
 
-let initialState = () => {start: false, x: 0, y: 0, last_tick: None, data: Some(GameState.initialState())};
+let initialState = () => {start: false, x: 0, y: 0, last_tick: None, data: Some(GameState.localStorageState())};
 
 let component = ReasonReact.reducerComponent("App");
 

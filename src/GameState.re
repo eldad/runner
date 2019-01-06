@@ -25,6 +25,7 @@ type t = {
   time: float,
   score: int,
   obstacles: array(float),
+  highscore: option(int),
 };
 
 let player_jump_t = 0.4;
@@ -48,7 +49,39 @@ let initialState = () => {
   time: 0.,
   score: 0,
   obstacles: [||],
+  highscore: None,
 };
+
+let resetState: t => t = state => {...initialState(), highscore: state.highscore};
+
+let localStorageState = () => {
+  let highscore = Dom.Storage.(localStorage |> getItem("highscore")) |> Js.Option.map((. v) => v |> int_of_string);
+  {...initialState(), highscore};
+};
+
+let localStorageSaveState: t => t =
+  state => {
+    switch (state.highscore) {
+    | Some(highscore) => Dom.Storage.(localStorage |> setItem("highscore", highscore |> string_of_int))
+    | _ => ()
+    };
+    state;
+  };
+
+let checkGameOver: t => t =
+  state =>
+    switch (state.state) {
+    | GameOver(_) =>
+      let highscore =
+        Some(
+          switch (state.highscore) {
+          | None => state.score
+          | Some(v) => Js.Math.max_int(state.score, v)
+          },
+        );
+      {...state, highscore} |> localStorageSaveState;
+    | _ => state
+    };
 
 let updateObstacles: t => t =
   state => {
@@ -69,7 +102,7 @@ let generateObstacles: t => t =
       let min_space = 120.;
       let last_distance = ref(state.distance +. 700.);
 
-      for (n in 0 to Random.int(9)) {
+      for (_ in 0 to Random.int(9)) {
         let distance = last_distance^ +. min_space +. Random.float(150.);
         state.obstacles |> Js.Array.push(distance) |> ignore;
         last_distance := distance;
@@ -132,15 +165,15 @@ let handleTick: (t, float) => t =
   (state, delta_t) =>
     switch (state.state) {
     | GameOver(t) => {...state, state: GameOver(Js.Math.max_float(0.0, t -. delta_t))}
-    | Run => state->updatePlayer(delta_t) |> checkCollision |> updateObstacles |> generateObstacles
+    | Run => state->updatePlayer(delta_t) |> checkCollision |> updateObstacles |> generateObstacles |> checkGameOver
     | _ => state
     };
 
 let handleKeyDown: t => t =
   state =>
     switch (state.state, state.player_jumping) {
-    | (Idle, _) => {...initialState(), state: Run}
-    | (GameOver(_), _) => initialState()
+    | (Idle, _) => {...resetState(state), state: Run}
+    | (GameOver(_), _) => resetState(state)
     | (Run, Ready) when state.player_y == 0. => {
         ...state,
         player_jumping: On(player_jump_t),

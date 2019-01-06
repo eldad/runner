@@ -16,7 +16,25 @@ let render_banner = (context, viewport_width, text) => {
   let y = 100;
   let fontsize = 48;
 
-  context->(Dom_html.setFont("48px 'Press Start 2P'"));
+  context->(Dom_html.setFont(Printf.sprintf("%dpx 'Press Start 2P'", fontsize)));
+  let text_width = context->(Dom_html.measureTextWidth(text));
+  let text_xpos = (viewport_width - text_width) / 2;
+
+  context->Dom_html.fillStyle("#0007");
+  context->Dom_html.fillRect(text_xpos - margin, y - margin - fontsize, text_width + margin * 2, fontsize + margin * 2);
+
+  context->Dom_html.fillStyle("#fff");
+  context->(Dom_html.fillText(text, text_xpos, y));
+};
+
+let render_highscore = (context, viewport_width, score: int) => {
+  let margin = 20;
+  let y = 200;
+  let fontsize = 32;
+
+  let text = Printf.sprintf("Highscore: %d", score);
+
+  context->(Dom_html.setFont(Printf.sprintf("%dpx 'Press Start 2P'", fontsize)));
   let text_width = context->(Dom_html.measureTextWidth(text));
   let text_xpos = (viewport_width - text_width) / 2;
 
@@ -34,7 +52,7 @@ let render_score = (context, points: int) => {
 
   let text = Printf.sprintf("Points: %d", points);
 
-  context->(Dom_html.setFont("16px 'Press Start 2P'"));
+  context->(Dom_html.setFont(Printf.sprintf("%dpx 'Press Start 2P'", fontsize)));
   let text_width = context->(Dom_html.measureTextWidth(text));
   let text_xpos = 10;
 
@@ -95,6 +113,14 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
   switch (data.state) {
   | Run when data.time > 3.0 => context->render_score(data.score)
   | GameOver(_) => context->render_score(data.score)
+  | _ => ()
+  };
+
+  /* Highscore */
+
+  switch (data.state, data.highscore) {
+  | (Idle, Some(score)) => context->render_highscore(width, score)
+  | (GameOver(_), Some(score)) => context->render_highscore(width, score)
   | _ => ()
   };
 
