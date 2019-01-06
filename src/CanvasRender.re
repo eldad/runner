@@ -11,7 +11,7 @@ let parallax = (offset: int, plane_index: int) =>
       (offset |> float_of_int) /. lagfactor |> Js.Math.floor;
     };
 
-let render_banner = (context, viewport_width, text) => {
+let render_banner = (context, viewport_width, text, modifier: float) => {
   let margin = 20;
   let y = 100;
   let fontsize = 48;
@@ -23,7 +23,8 @@ let render_banner = (context, viewport_width, text) => {
   context->Dom_html.fillStyle("#0007");
   context->Dom_html.fillRect(text_xpos - margin, y - margin - fontsize, text_width + margin * 2, fontsize + margin * 2);
 
-  context->Dom_html.fillStyle("#fff");
+  let color_intensity = (1.0 -. Js.Math.min_float(modifier, 1.0)) *. 255. |> int_of_float;
+  context->Dom_html.fillStyle(Printf.sprintf("rgb(%d, %d, %d)", color_intensity, color_intensity, color_intensity));
   context->(Dom_html.fillText(text, text_xpos, y));
 };
 
@@ -102,9 +103,9 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
   /* Banner */
 
   switch (data.state) {
-  | Idle => context->render_banner(width, "Ready?")
-  | Run when data.time < 2.0 => context->render_banner(width, "Run!")
-  | GameOver(_) => context->render_banner(width, "Game Over")
+  | Idle(t) => context->render_banner(width, "Ready?", t)
+  | Run when data.time < 2.0 => context->render_banner(width, "Run!", 2.0 -. data.time)
+  | GameOver(t) => context->render_banner(width, "Game Over", t)
   | _ => ()
   };
 
@@ -119,7 +120,7 @@ let render = (~width, ~height, ~context: Dom_html.context, ~data: GameState.t, (
   /* Highscore */
 
   switch (data.state, data.highscore) {
-  | (Idle, Some(score)) => context->render_highscore(width, score)
+  | (Idle(_), Some(score)) => context->render_highscore(width, score)
   | (GameOver(_), Some(score)) => context->render_highscore(width, score)
   | _ => ()
   };

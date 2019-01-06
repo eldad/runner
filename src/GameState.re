@@ -11,7 +11,7 @@ type exhaustable =
   | Exhausted;
 
 type state =
-  | Idle
+  | Idle(float)
   | Run
   | GameOver(float);
 
@@ -36,11 +36,12 @@ let player_jump_t0_velocity = 125.;
 let player_collision_x1 = 20.;
 let player_collision_x2 = player_collision_x1 +. 12.; /* greenbob is 12px long */
 
-let gameover_timeout = 10.;
+let gameover_timeout = 1.;
+let idle_timeout = 0.5;
 let obstacle_horizon = 700.;
 
 let initialState = () => {
-  state: Idle,
+  state: Idle(idle_timeout),
   player_jumping: Ready,
   player_velocity: 0.,
   player_y: 0.,
@@ -165,15 +166,15 @@ let handleTick: (t, float) => t =
   (state, delta_t) =>
     switch (state.state) {
     | GameOver(t) => {...state, state: GameOver(Js.Math.max_float(0.0, t -. delta_t))}
+    | Idle(t) => {...state, state: Idle(Js.Math.max_float(0.0, t -. delta_t))}
     | Run => state->updatePlayer(delta_t) |> checkCollision |> updateObstacles |> generateObstacles |> checkGameOver
-    | _ => state
     };
 
 let handleKeyDown: t => t =
   state =>
     switch (state.state, state.player_jumping) {
-    | (Idle, _) => {...resetState(state), state: Run}
-    | (GameOver(_), _) => resetState(state)
+    | (Idle(0.), _) => {...resetState(state), state: Run}
+    | (GameOver(0.), _) => resetState(state)
     | (Run, Ready) when state.player_y == 0. => {
         ...state,
         player_jumping: On(player_jump_t),
