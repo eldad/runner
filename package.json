@@ -11,8 +11,9 @@
     "reason-scripts": "1.0.0"
   },
   "scripts": {
+    "service-worker": "sw-precache --config=sw-precache-config.js",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && sw-precache --config=sw-precache-config.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -29,6 +30,7 @@
     "@glennsl/bs-jest": "^0.4.5",
     "bs-fetch": "^0.3.1",
     "bs-platform": "^4.0.7",
-    "reason-react": "^0.5.3"
+    "reason-react": "^0.5.3",
+    "sw-precache": "^5.2.1"
   }
 }
