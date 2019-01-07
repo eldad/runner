@@ -4,11 +4,11 @@
 # 'clean':         clean up generated files
 # 'bs':            make bucklescript
 
-.PHONY: build deps root clean remake build start bs public/media
+.PHONY: build deps root clean remake build start bs public/media favicon
 build: deps
 	yarn build
 
-deps: public root public/media
+deps: public root public/media favicon
 
 remake: clean all
 
@@ -29,8 +29,8 @@ public/index.html: root/index.html
 public/manifest.json: root/manifest.json
 	cp root/manifest.json public/
 
-public/favicon.ico: root/favicon.ico
-	cp root/favicon.ico public/
+favicon: root/favicon/*
+	cp root/favicon/* public/
 
 start: deps
 	# https://github.com/facebook/create-react-app/issues/2495
