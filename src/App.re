@@ -153,7 +153,7 @@ let make = _children => {
           <button className=Glamor.(css([padding("10px")])) onClick={_e => self.send(Fullscreen)}>
             {"Run! (Fullscreen)" |> ReasonReact.string}
           </button>
-          <p>
+          <p className=Glamor.(css([fontSize("0.7rem")]))>
             {
               "Warning! Persons (or cats) playing this may experience severe side effects such as"
               ++ " - but not limited to - significant time loss, rage quitness and chronic boredom. "
@@ -161,6 +161,17 @@ let make = _children => {
               |> ReasonReact.string
             }
           </p>
+          <div className=Glamor.(css([fontSize("0.5rem"), textAlign("center")]))>
+            {
+              [|
+                "Copyright (c) 2018 Eldad Zack <eldad@fogrefinery.com>",
+                "+++",
+                "Pixel Art from OpenGameArt.org by <a href=https://opengameart.org/users/grafxkid>Jason Mercado (GrafixKid)</a>",
+              |]
+              |> Array.mapi((i, s) => <p key={i |> string_of_int} dangerouslySetInnerHTML={"__html": s} />)
+              |> ReasonReact.array
+            }
+          </div>
         </div>
       </div>
     </div>,
