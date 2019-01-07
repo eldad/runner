@@ -49,7 +49,8 @@ let make = _children => {
       if (!e->Dom_html.keyboardEventIsRepeat) {
         let code = e->Dom_html.keyboardEventKey;
         switch (code) {
-        | "w" => self.send(KeyDown)
+        | "w"
+        | " " => self.send(KeyDown)
         | _ => ()
         };
       };
@@ -62,7 +63,8 @@ let make = _children => {
     let keyup = e => {
       let code = e->Dom_html.keyboardEventKey;
       switch (code) {
-      | "w" => self.send(KeyUp)
+      | "w"
+      | " " => self.send(KeyUp)
       | _ => ()
       };
 
