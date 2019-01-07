@@ -100,9 +100,6 @@ let make = _children => {
     | (Some(context), Some(data)) =>
       Dom_html.requestAnimationFrame(_f => CanvasRender.render(~context, ~width=canvas_width, ~height=canvas_height, ~data, ()))
       |> ignore
-    /*
-     | (Some(context), None) => attraction screen
-     */
     | _ => ()
     };
   },
@@ -110,6 +107,12 @@ let make = _children => {
     <div className=Glamor.(css([display("flex"), alignItems("center"), flexDirection("column")]))>
       <canvas
         id="canvas"
+        className=Glamor.(
+          css([
+            Selector(":not(:fullscreen)", [display("none")]),
+            Selector(":not(:-webkit-full-screen)", [display("none")]) /* Chrome on Android */
+          ])
+        )
         width={canvas_width |> string_of_int}
         height={canvas_height |> string_of_int}
         onTouchStart={_e => self.send(KeyDown)}
@@ -123,7 +126,43 @@ let make = _children => {
           }
         }
       />
-      <div> <button onClick={_e => self.send(Fullscreen)}> {"Fullscreen" |> ReasonReact.string} </button> </div>
+      <div className=Glamor.(css([display("flex"), alignItems("center"), flexDirection("column")]))>
+        <div
+          className=Glamor.(
+            css([
+              display("flex"),
+              alignItems("center"),
+              flexDirection("column"),
+              textAlign("justify"),
+              maxWidth("600px"),
+              Selector("@media (max-width: 600px)", [maxWidth("80vw")]),
+              padding("10px"),
+            ])
+          )>
+          <p> {"Runner" |> ReasonReact.string} </p>
+          {
+            switch (self.state.data) {
+            | Some(data) =>
+              switch (data.highscore) {
+              | Some(highscore) => <p> {Printf.sprintf("Highscore: %d", highscore) |> ReasonReact.string} </p>
+              | _ => ReasonReact.null
+              }
+            | _ => ReasonReact.null
+            }
+          }
+          <button className=Glamor.(css([padding("10px")])) onClick={_e => self.send(Fullscreen)}>
+            {"Run! (Fullscreen)" |> ReasonReact.string}
+          </button>
+          <p>
+            {
+              "Warning! Persons (or cats) playing this may experience severe side effects such as"
+              ++ " - but not limited to - significant time loss, rage quitness and chronic boredom. "
+              ++ "You may or may not be excited. Your highscore is all that matters -- make it count."
+              |> ReasonReact.string
+            }
+          </p>
+        </div>
+      </div>
     </div>,
   /*
    <div className=Glamor.(css([backgroundColor("#333")]))>
