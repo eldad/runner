@@ -164,7 +164,7 @@ let make = _children => {
           <div className=Glamor.(css([fontSize("0.5rem"), textAlign("center")]))>
             {
               [|
-                "Copyright (c) 2018 Eldad Zack <eldad@fogrefinery.com>",
+                "Copyright (c) 2019 Eldad Zack <eldad@fogrefinery.com>",
                 "+++",
                 "Pixel Art from OpenGameArt.org by <a href=https://opengameart.org/users/grafxkid>Jason Mercado (GrafixKid)</a>",
               |]
