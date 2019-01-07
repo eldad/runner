@@ -823,23 +823,12 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
-"@eldadzack/rr-mdi@https://github.com/eldad/rr-mdi.git":
-  version "0.1.0"
-  resolved "https://github.com/eldad/rr-mdi.git#c50c54d4a6daf50f53e1340cc39d9116f73b19c0"
-  dependencies:
-    "@mdi/font" "^3.0.39"
-
 "@glennsl/bs-jest@^0.4.5":
   version "0.4.5"
   resolved "https://registry.yarnpkg.com/@glennsl/bs-jest/-/bs-jest-0.4.5.tgz#f6259f8457cc9f09b3c07f97073c6b00c81a048d"
   integrity sha512-iDhVxPdZf5yMBJlMY+b9BR4G8/DQICbWvxYwI71VpEOKxhZW9h8Sx+pm4Y6xpVZOenT7sVJ5O62Q+UW6Rmducw==
   dependencies:
     jest "^23.5.0"
-
-"@mdi/font@^3.0.39":
-  version "3.2.89"
-  resolved "https://registry.yarnpkg.com/@mdi/font/-/font-3.2.89.tgz#91790717881c8839729286e516436e7b9f3d96ea"
-  integrity sha512-K+E44jDkv7jwJbRYctw5+k+jE0j43dCN9KH3ZsIcqYjmhQ3ZN3/eBM2oXtFhxSOKYpEn/xFStS+SGRZjlJY/dg==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -1123,11 +1112,6 @@ alphanum-sort@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
   integrity sha1-l6ERlkmyEa0zaR2fn0hqjsn74KM=
-
-animate.css@^3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/animate.css/-/animate.css-3.7.0.tgz#5de25d1ee5fba11ba6a1e2c4fa568f512eb7d4da"
-  integrity sha512-u3iMXDJr0cxMdQocIciDiou9Au4L5f9uT+/jCtprw3s1j3HcfCuI+khF+90Ps2KdsEhM2soF7SXB4WUvI3HlXg==
 
 ansi-align@^2.0.0:
   version "2.0.0"

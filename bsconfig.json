@@ -8,8 +8,7 @@
     "reason-react",
     "@glennsl/bs-jest",
     "bs-fetch",
-    "bs-glamor",
-    "@eldadzack/rr-mdi"
+    "bs-glamor"
   ],
   "reason": {
     "react-jsx": 2

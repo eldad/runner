@@ -8,7 +8,7 @@
 build: deps
 	yarn build
 
-deps: public root public/mdi public/animate.css public/media
+deps: public root public/media
 
 remake: clean all
 
@@ -31,17 +31,6 @@ public/manifest.json: root/manifest.json
 
 public/favicon.ico: root/favicon.ico
 	cp root/favicon.ico public/
-
-public/mdi:
-	mkdir -p public/mdi/fonts
-	cp node_modules/\@mdi/font/fonts/materialdesignicons-webfont.* \
-		node_modules/\@mdi/font/css/materialdesignicons.min.css \
-		node_modules/\@mdi/font/css/materialdesignicons.min.css.map \
-		public/mdi/fonts
-
-public/animate.css:
-	mkdir -p public/animate.css
-	cp node_modules/animate.css/animate.min.css public/animate.css/animate.min.css
 
 start: deps
 	# https://github.com/facebook/create-react-app/issues/2495
