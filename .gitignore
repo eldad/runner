@@ -4,6 +4,7 @@
 
 .vscode
 /SCRATCHPAD.*
+nginx.sh
 
 # bucklescript
 /lib
