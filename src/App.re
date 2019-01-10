@@ -26,10 +26,21 @@ type state = {
   data: option(GameState.t),
 };
 
+let minimum_tick = 0.1;
+
 let handleTick: (state, float) => state =
   (state, delta_t) =>
     switch (state.data) {
-    | Some(data) when delta_t < 1.0 => {...state, data: Some(data->GameState.handleTick(delta_t))}
+    | Some(data) =>
+      let ret_state = ref(state);
+      let residual_delta_t = ref(delta_t);
+      while (residual_delta_t^ > 0.) {
+        let current_delta_t = Js.Math.min_float(residual_delta_t^, minimum_tick);
+        ret_state := {...ret_state^, data: Some(data->GameState.handleTick(current_delta_t))};
+        residual_delta_t := residual_delta_t^ -. minimum_tick;
+      };
+      ret_state^;
+
     | _ => state
     };
 
