@@ -11,6 +11,7 @@ Random.self_init();
 
 type action =
   | Start
+  | WipeSave
   | Fullscreen
   | Tick
   | CanvasClick(int, int)
@@ -87,6 +88,11 @@ let make = _children => {
         let delta_t = now -. last_tick;
         ReasonReact.Update({...state->handleTick(delta_t), last_tick: Some(now)});
       };
+    | (WipeSave, _) =>
+      ReasonReact.UpdateWithSideEffects(
+        {...state, data: Some(GameState.initialState())},
+        (_self => Dom.Storage.(localStorage |> clear)),
+      )
     | (Fullscreen, _) => ReasonReact.SideEffects((_self => Dom_html.requestFullscreenElement("canvas") |> ignore))
     | (CanvasClick(x, y), _) =>
       /* velocity -100..100 */
@@ -94,7 +100,7 @@ let make = _children => {
       ReasonReact.Update({...state, x, y})
     | (KeyDown, Some(data)) => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyDown)})
     | (KeyUp, Some(data)) => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyUp)})
-    | _ => ReasonReact.NoUpdate
+    | (KeyDown | KeyUp, None) => ReasonReact.NoUpdate
     },
   didUpdate: oldAndNewSelf => {
     let self = oldAndNewSelf.newSelf;
@@ -155,6 +161,19 @@ let make = _children => {
           <button className=Glamor.(css([padding("10px")])) onClick={_e => self.send(Fullscreen)}>
             {"Run! (Fullscreen)" |> ReasonReact.string}
           </button>
+          {
+            switch (self.state.data) {
+            | Some(data) =>
+              switch (data.highscore) {
+              | Some(_) =>
+                <button className=Glamor.(css([padding("10px")])) onClick=(_e => self.send(WipeSave))>
+                  {Printf.sprintf("Wipe Save") |> ReasonReact.string}
+                </button>
+              | None => ReasonReact.null
+              }
+            | None => ReasonReact.null
+            }
+          }
           <p className=Glamor.(css([fontSize("0.7rem")]))>
             {
               "Warning! Persons (or cats) playing this may experience severe side effects such as"
