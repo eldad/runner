@@ -12,16 +12,14 @@ Random.self_init();
 type action =
   | Start
   | WipeSave
-  | Fullscreen
+  | Fullscreen(bool)
   | Tick
-  | CanvasClick(int, int)
   | KeyUp
   | KeyDown;
 
 type state = {
   start: bool,
-  x: int,
-  y: int,
+  fullscreen: bool,
   last_tick: option(float),
   data: option(GameState.t),
 };
@@ -44,7 +42,7 @@ let handleTick: (state, float) => state =
     | _ => state
     };
 
-let initialState = () => {start: false, x: 0, y: 0, last_tick: None, data: Some(GameState.localStorageState())};
+let initialState = () => {start: false, fullscreen: false, last_tick: None, data: Some(GameState.localStorageState())};
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -104,14 +102,10 @@ let make = _children => {
         {...state, data: Some(GameState.initialState())},
         (_self => Dom.Storage.(localStorage |> clear)),
       )
-    | (Fullscreen, _) => ReasonReact.SideEffects((_self => Dom_html.requestFullscreenElement("canvas") |> ignore))
-    | (CanvasClick(x, y), _) =>
-      /* velocity -100..100 */
-      /* let velocity = 200 * (x - canvas_width / 2) / canvas_width; */
-      ReasonReact.Update({...state, x, y})
-    | (KeyDown, Some(data)) => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyDown)})
-    | (KeyUp, Some(data)) => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyUp)})
-    | (KeyDown | KeyUp, None) => ReasonReact.NoUpdate
+    | (Fullscreen(fullscreen), _) => ReasonReact.Update({...state, fullscreen})
+    | (KeyDown, Some(data)) when state.fullscreen => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyDown)})
+    | (KeyUp, Some(data)) when state.fullscreen => ReasonReact.Update({...state, data: Some(data->GameState.handleKeyUp)})
+    | (KeyDown | KeyUp, _) => ReasonReact.NoUpdate
     },
   didUpdate: oldAndNewSelf => {
     let self = oldAndNewSelf.newSelf;
@@ -138,12 +132,6 @@ let make = _children => {
         onTouchEnd={_e => self.send(KeyUp)}
         onMouseDown={_e => self.send(KeyDown)}
         onMouseUp={_e => self.send(KeyUp)}
-        onClick={
-          e => {
-            let ne = e |> ReactEvent.Mouse.nativeEvent;
-            self.send(CanvasClick(ne##offsetX, ne##offsetY));
-          }
-        }
       />
       <div className=Glamor.(css([display("flex"), alignItems("center"), flexDirection("column")]))>
         <div
@@ -169,7 +157,14 @@ let make = _children => {
             | _ => ReasonReact.null
             }
           }
-          <button className=Glamor.(css([padding("10px")])) onClick={_e => self.send(Fullscreen)}>
+          <button
+            className=Glamor.(css([padding("10px")]))
+            onClick={
+              _e => {
+                Dom_html.requestFullscreenElement("canvas") |> ignore;
+                self.send(Fullscreen(true));
+              }
+            }>
             {"Run! (Fullscreen)" |> ReasonReact.string}
           </button>
           {
@@ -207,9 +202,4 @@ let make = _children => {
         </div>
       </div>
     </div>,
-  /*
-   <div className=Glamor.(css([backgroundColor("#333")]))>
-     {Printf.sprintf("x: %d, y: %d", self.state.x, self.state.y) |> ReasonReact.string}
-   </div>
-   */
 };
