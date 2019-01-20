@@ -182,8 +182,7 @@ let make = _children => {
           }
           <p className=Glamor.(css([fontSize("0.7rem")]))>
             {
-              "Warning! Persons (or cats) playing this may experience severe side effects such as"
-              ++ " - but not limited to - significant time loss, rage quitness and chronic boredom. "
+              "Warning! Persons (or cats) playing this game may experience severe side effects."
               ++ "You may or may not be excited. Your highscore is all that matters -- make it count."
               |> ReasonReact.string
             }
