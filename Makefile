@@ -18,7 +18,7 @@ clean:
 public:
 	mkdir -p public
 
-root: public/index.html public/manifest.json public/favicon.ico
+root: public/index.html public/manifest.json favicon
 
 public/media:
 	rsync -ra --delete --exclude CREDITS root/media/ public/media/
