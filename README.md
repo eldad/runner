@@ -2,6 +2,8 @@
 
 A simple runner game written using ReasonReact.
 
+Play it [here!](https://eldad.github.io/runner/)
+
 Features:
 * Amazing parallax effect
 * Continuous stream of crates to jump above

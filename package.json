@@ -2,6 +2,7 @@
   "name": "runner",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://eldad.github.io/runner/",
   "dependencies": {
     "bs-glamor": "https://github.com/reasonml-community/bs-glamor.git#1d0202edf30b1184acdf073548a005cf172b8a74",
     "react": "^16.6.3",
@@ -13,7 +14,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build && sw-precache --config=sw-precache-config.js",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -28,6 +30,7 @@
     "@glennsl/bs-jest": "^0.4.5",
     "bs-fetch": "^0.3.1",
     "bs-platform": "^4.0.7",
+    "gh-pages": "^2.0.1",
     "reason-react": "^0.5.3",
     "sw-precache": "^5.2.1"
   }
